@@ -29,8 +29,16 @@ jobs:
             force_include = true
             ['**/*?.vsh']
             force_include = true
+      
+      - name: Generate SHA1 hash 🧮
+        run: |
+          sha1sum /tmp/pack.zip | awk '{print $1}' > hash.txt
+          cat hash.txt
+      
       - name: Tag and create release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: latest
-          files: /tmp/pack.zip
+          files: |
+            /tmp/pack.zip
+            hash.txt
