@@ -1,0 +1,36 @@
+name: "build resource pack"
+
+on:
+  push:
+    branches:
+      - "master"
+
+jobs:
+  pre-release:
+    name: "Optimize resource pack"
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # A non-shallow repository clone is required
+      - name: Run PackSquash
+        uses: ComunidadAylas/PackSquash-action@v4.0.3
+        with:
+          packsquash_version: latest
+          options: |
+            pack_directory = 'pack'
+            zip_spec_conformance_level = 'high'
+            output_file_path = '/tmp/pack.zip'
+            
+            # Temp fix for packsquash, not including shaders for some reason
+            ['**/*?.fsh']
+            force_include = true
+            ['**/*?.vsh']
+            force_include = true
+      - name: Tag and create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          files: /tmp/pack.zip
